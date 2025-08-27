@@ -1,8 +1,4 @@
 [package]
-org = "sachink"
-name = "ballerina"
+org = "rocky"
+name = "devant_azure_files_test"
 version = "0.1.0"
-distribution = "2201.12.8"
-
-[build-options]
-observabilityIncluded = true
