@@ -16,6 +16,7 @@ public function main() returns error? {
     file:MetaData fi = check file:getMetaData("resources/file-10mb.txt");
     int fileSize = fi.size;
     check fileClient->createFile(fileShareName = "testf1", newFileName = "file-10mb.txt", fileSizeInByte = fileSize, azureDirectoryPath = "test-smb");
+    io:println("File created successfully");
     check fileClient->putRange(fileShareName = "testf1", localFilePath = "resources/file-10mb.txt", azureFileName = "file-10mb.txt", azureDirectoryPath = "test-smb");
     io:println("Added content to the file!");
 }
