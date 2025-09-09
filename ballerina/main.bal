@@ -13,9 +13,10 @@ azure_files:ConnectionConfig fileServiceConfig = {
 azure_files:FileClient fileClient = check new (fileServiceConfig);
 
 public function main() returns error? {
-    string localFilePath = "resources/file-10mb.txt";
+    string localFilePath = "resources/file-500mb.txt";
     string fileShareName = "testf1";
-    string azureDirectoryPath = "test-10";
+    string azureDirectoryPath = "test-500";
+    check createUploadFile(500 ,"mb");
 
     // Repeat upload 10 times for accuracy
     foreach int i in 0 ..< 10 {
@@ -23,7 +24,7 @@ public function main() returns error? {
         // check fileClient->createFile(fileShareName = fileShareName, newFileName = azureFileName, fileSizeInByte = fileSize, azureDirectoryPath = azureDirectoryPath);
         // io:println(string `Run ${i + 1}: File created successfully`);
 
-        string azureFileName = string `file-10mb-${i+1}.txt`;
+        string azureFileName = string `file-500mb-${i+1}.txt`;
 
         time:Utc startTime = time:utcNow();
         check fileClient->directUpload(
@@ -37,4 +38,19 @@ public function main() returns error? {
         io:println(string `Run ${i + 1}: Upload duration = ${seconds} seconds`);
     }
     io:println("Completed 10 upload runs.");
+}
+
+function createUploadFile(int size, string s) returns error? {
+        string filePath = "resources/file-" + size.toBalString() + s + ".txt";
+        io:WritableByteChannel channel = check io:openWritableFile(filePath);
+        // Write zeros to the file in 1MB chunks
+        int chunkCount = size / 10;
+        int written = 0;
+        byte[] buffer = check io:fileReadBytes("resources/file-10mb.txt");
+        while (written < chunkCount) {
+            check io:fileWriteBytes(filePath, buffer, io:APPEND);
+            written += 1;
+        }
+        check channel.close();
+        io:println("Created " + filePath + " of size " + size.toBalString() + " bytes");
 }
