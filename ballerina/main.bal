@@ -3,7 +3,6 @@ import ballerina/io;
 import ballerinax/azure_storage_service.files as azure_files;
 import ballerina/time;
 
-configurable string size = ?;
 configurable string SAS = ?;
 configurable string accountName = ?;
 
