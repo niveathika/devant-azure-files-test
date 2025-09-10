@@ -41,6 +41,7 @@ public function main() returns error? {
 }
 
 function createUploadFile(string filePath, int size) returns error? {
+        io:println(string `Creating file of size ${size} Mb at path ${filePath}`);
         io:WritableByteChannel channel = check io:openWritableFile(filePath);
         // Write zeros to the file in 1MB chunks
         int chunkCount = size / 10;
