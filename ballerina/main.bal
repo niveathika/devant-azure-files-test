@@ -26,10 +26,10 @@ public function main() returns error? {
         string azureFileName = string `file-10mb-${i+1}.txt`;
 
         time:Utc startTime = time:utcNow();
-        check fileClient->directUpload(
+        check fileClient->getFile(
             fileShareName = fileShareName, 
-            localFilePath = localFilePath, 
-            azureFileName = azureFileName, 
+            fileName = azureFileName,
+            localFilePath = "/tmp/" + azureFileName,
             azureDirectoryPath = azureDirectoryPath);
         time:Utc endTime = time:utcNow();
 
