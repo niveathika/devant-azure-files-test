@@ -24,7 +24,7 @@ public function main() returns error? {
         // check fileClient->createFile(fileShareName = fileShareName, newFileName = azureFileName, fileSizeInByte = fileSize, azureDirectoryPath = azureDirectoryPath);
         // io:println(string `Run ${i + 1}: File created successfully`);
 
-        string azureFileName = string `file-500mb-${i+1}.txt`;
+        string azureFileName = string `file-1gb-${i+1}.txt`;
 
         time:Utc startTime = time:utcNow();
         check fileClient->directUpload(
