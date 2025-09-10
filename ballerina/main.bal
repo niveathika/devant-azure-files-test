@@ -13,10 +13,10 @@ azure_files:ConnectionConfig fileServiceConfig = {
 azure_files:FileClient fileClient = check new (fileServiceConfig);
 
 public function main() returns error? {
-    string localFilePath = "/tmp/file-500mb.txt";
+    string localFilePath = "/tmp/file-1gb.txt";
     string fileShareName = "testf1";
-    string azureDirectoryPath = "test-500";
-    check createUploadFile(500 ,"mb");
+    string azureDirectoryPath = "test-1g";
+    check createUploadFile(1024 ,"gb");
 
     // Repeat upload 10 times for accuracy
     foreach int i in 0 ..< 10 {
@@ -41,7 +41,7 @@ public function main() returns error? {
 }
 
 function createUploadFile(int size, string s) returns error? {
-        string filePath = "/tmp/file-" + size.toBalString() + s + ".txt";
+        string filePath = "/tmp/file-1gb.txt";
         io:WritableByteChannel channel = check io:openWritableFile(filePath);
         // Write zeros to the file in 1MB chunks
         int chunkCount = size / 10;
