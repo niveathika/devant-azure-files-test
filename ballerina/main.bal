@@ -16,7 +16,7 @@ public function main() returns error? {
     string localFilePath = "/tmp/file-1gb.txt";
     string fileShareName = "testf1";
     string azureDirectoryPath = "test-1g";
-    check createUploadFile(localFilePath, 1024);
+    check createUploadFile(localFilePath, 500);
 
     // Repeat upload 10 times for accuracy
     foreach int i in 0 ..< 10 {
