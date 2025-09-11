@@ -13,9 +13,9 @@ azure_files:ConnectionConfig fileServiceConfig = {
 azure_files:FileClient fileClient = check new (fileServiceConfig);
 
 public function main() returns error? {
-    string localFilePath = "resources/file-10mb.txt";
+    string localFilePath = "resources/file-500mb.txt";
     string fileShareName = "testf1";
-    string azureDirectoryPath = "test-10";
+    string azureDirectoryPath = "test-500";
 
     // Repeat upload 10 times for accuracy
     foreach int i in 0 ..< 10 {
@@ -23,7 +23,7 @@ public function main() returns error? {
         // check fileClient->createFile(fileShareName = fileShareName, newFileName = azureFileName, fileSizeInByte = fileSize, azureDirectoryPath = azureDirectoryPath);
         // io:println(string `Run ${i + 1}: File created successfully`);
 
-        string azureFileName = string `file-10mb-${i+1}.txt`;
+        string azureFileName = string `file-500mb-${i+1}.txt`;
 
         time:Utc startTime = time:utcNow();
         check fileClient->getFile(
