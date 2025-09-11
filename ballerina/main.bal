@@ -34,17 +34,9 @@ public function main() returns error? {
         time:Utc endTime = time:utcNow();
 
         time:Seconds seconds = time:utcDiffSeconds(endTime, startTime);
-        io:println(string `Run ${i + 1}: Upload duration = ${seconds} seconds`);
-    }
+        io:println(string `Run ${i + 1}: Download duration = ${seconds} seconds`);
 
-    foreach int i in 0 ..< 10 {
-        //Create the file in Azure Files
-        // check fileClient->createFile(fileShareName = fileShareName, newFileName = azureFileName, fileSizeInByte = fileSize, azureDirectoryPath = azureDirectoryPath);
-        // io:println(string `Run ${i + 1}: File created successfully`);
-
-        string azureFileName = string `file-10mb-${i+1}.txt`;
-
-        time:Utc startTime = time:utcNow();
+        time:Utc startTimeProcess = time:utcNow();
         stream<string, io:Error?> fileLines = check io:fileReadLinesAsStream("/tmp/" + azureFileName);
         int lineCount = 0;
         check from string _ in fileLines 
@@ -52,11 +44,13 @@ public function main() returns error? {
             lineCount += 1;
         };
         io:println(string `Run ${i + 1}: Total lines read = ${lineCount}`);
-        time:Utc endTime = time:utcNow();
+        time:Utc endTimeProcess = time:utcNow();
 
-        time:Seconds seconds = time:utcDiffSeconds(endTime, startTime);
-        io:println(string `Run ${i + 1}: Upload duration = ${seconds} seconds`);
+        time:Seconds processSec = time:utcDiffSeconds(endTimeProcess, startTimeProcess);
+        io:println(string `Run ${i + 1}: Process duration = ${processSec} seconds`);
+
+        io:println(string `Total time (download + process) = ${seconds + processSec} seconds`);
     }
 
-    io:println("Completed 10 upload runs.");
+    io:println("Completed 10 download runs.");
 }
