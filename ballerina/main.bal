@@ -1,6 +1,7 @@
 import ballerina/io;
 import ballerina/time;
 import ballerinax/azure_storage_service.files as azure_files;
+import ballerina/file;
 
 configurable string SAS = ?;
 configurable string accountName = ?;
@@ -94,6 +95,7 @@ public function main() returns error? {
         io:println(string `Run ${i + 1}: Process duration = ${processSec} seconds`);
 
         io:println(string `Total time (download + process) = ${seconds + processSec} seconds`);
+        check file:remove("/tmp/" + azureFileName);
     }
 
     io:println("Completed 10 download runs.");
