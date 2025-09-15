@@ -57,9 +57,6 @@ public function main() returns error? {
         int chunkSize = 4 * 1024 * 1024; // 4 MB
         int offset = 0;
         
-        io:WritableByteChannel openWritableFile = 
-            check io:openWritableFile("/tmp/" + azureFileName, io:APPEND);
-
         while offset < Length {
             int bytesToRead = (Length - offset) < chunkSize ? (Length - offset) : chunkSize;
             byte[] chunk = check fileClient->getFileAsByteArray(
@@ -71,10 +68,9 @@ public function main() returns error? {
                 endByte: offset + bytesToRead - 1
             }
             );
-            _ = check openWritableFile.write(chunk, offset);
+            _ = check io:fileWriteBytes("/tmp/" + azureFileName, chunk, io:APPEND);
             offset += bytesToRead;
         }
-        check openWritableFile.close();
         time:Utc endTime = time:utcNow();
 
         time:Seconds seconds = time:utcDiffSeconds(endTime, startTime);
