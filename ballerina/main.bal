@@ -81,7 +81,8 @@ public function main() returns error? {
         int lineCount = 0;
         check from string line in fileLines 
         do {
-            if line != "This is a perf test line for Azure Files." {
+            if line != "This is a perf test line for Azure Files."  ||
+               line != "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" {
                 io:println("Data mismatch found!");
             }
             lineCount += 1;
