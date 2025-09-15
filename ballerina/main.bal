@@ -13,9 +13,9 @@ azure_files:ConnectionConfig fileServiceConfig = {
 azure_files:FileClient fileClient = check new (fileServiceConfig);
 
 public function main() returns error? {
-    string localFilePath = "resources/file-500mb.txt";
+    string localFilePath = "resources/file-10mb.txt";
     string fileShareName = "testf1";
-    string azureDirectoryPath = "test-500";
+    string azureDirectoryPath = "test-10";
 
 
     azure_files:FileList file500mb = check fileClient->getFileList(
@@ -46,7 +46,7 @@ public function main() returns error? {
         // check fileClient->createFile(fileShareName = fileShareName, newFileName = azureFileName, fileSizeInByte = fileSize, azureDirectoryPath = azureDirectoryPath);
         // io:println(string `Run ${i + 1}: File created successfully`);
 
-        string azureFileName = string `file-500mb-${i+1}.txt`;
+        string azureFileName = string `file-10mb-${i+1}.txt`;
         int Length = metadata[azureFileName] ?: 0;
         io:println(string `File ${azureFileName} of size ${Length}..`);
 
@@ -81,9 +81,9 @@ public function main() returns error? {
         int lineCount = 0;
         check from string line in fileLines 
         do {
-            if line != "This is a perf test line for Azure Files."  ||
-               line != "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" {
-                io:println("Data mismatch found!");
+            if line != "This is a perf test line for Azure Files." && 
+                line != "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" {
+                io:println(string `Diff line: "${line}"`);
             }
             lineCount += 1;
         };
