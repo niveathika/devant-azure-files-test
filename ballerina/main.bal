@@ -1,6 +1,6 @@
 import ballerina/io;
 import ballerina/time;
-import ballerinax/azure_storage_service.files as azure_files;
+import ballerinax/azure_storage_service.blobs as azure_files;
 
 configurable string SAS = ?;
 configurable string accountName = ?;
@@ -10,35 +10,12 @@ azure_files:ConnectionConfig fileServiceConfig = {
     accountName: accountName,
     authorizationMethod: azure_files:ACCESS_KEY
 };
-azure_files:FileClient fileClient = check new (fileServiceConfig);
+azure_files:BlobClient fileClient = check new (fileServiceConfig);
 
 public function main() returns error? {
     string localFilePath = "resources/file-10mb.txt";
     string fileShareName = "testf1";
     string azureDirectoryPath = "test-10";
-
-
-    azure_files:FileList file500mb = check fileClient->getFileList(
-            fileShareName = fileShareName, 
-            azureDirectoryPath = azureDirectoryPath);
-    azure_files:File|azure_files:File[] files = file500mb.File;
-    map<int> metadata = {};
-    if files is azure_files:File[] {
-        files.forEach(function (azure_files:File file) {
-            azure_files:PropertiesFileItem|"" properties = file.Properties ?: "";
-            int length = 0;
-            do {
-	            length = properties is string ? 0 : properties["Content-Length"] is () ? 0 : check int:fromString(properties["Content-Length"] ?: "0");
-            } on fail {
-            	
-            }
-            metadata[file.Name] = length;
-        });
-    } else {
-        azure_files:PropertiesFileItem|"" properties = files.Properties ?: "";
-        int length = properties is string ? 0 : properties["Content-Length"] is () ? 0 : check int:fromString(properties["Content-Length"] ?: "0");
-        metadata[files.Name] = length;
-    }
 
     // Repeat upload 10 times for accuracy
     foreach int i in 0 ..< 10 {
@@ -46,29 +23,30 @@ public function main() returns error? {
         // check fileClient->createFile(fileShareName = fileShareName, newFileName = azureFileName, fileSizeInByte = fileSize, azureDirectoryPath = azureDirectoryPath);
         // io:println(string `Run ${i + 1}: File created successfully`);
 
-        string azureFileName = string `file-10mb-${i+1}.txt`;
-        int Length = metadata[azureFileName] ?: 0;
+        string azureFileName = string `file-10mb-${i + 1}.txt`;
+        int Length = 10485760;
         io:println(string `File ${azureFileName} of size ${Length}..`);
 
         //Download the file from Azure Files
 
-
         time:Utc startTime = time:utcNow();
         int chunkSize = 4 * 1024 * 1024; // 4 MB
         int offset = 0;
-        
+        int chunkCount = 0;
+
         while offset < Length {
             int bytesToRead = (Length - offset) < chunkSize ? (Length - offset) : chunkSize;
-            byte[] chunk = check fileClient->getFileAsByteArray(
-            fileShareName = fileShareName,
-            azureDirectoryPath = azureDirectoryPath,
-            fileName = azureFileName,
-            range = {
+            azure_files:BlobResult chunk = check fileClient->getBlob(
+            containerName = azureDirectoryPath,
+            blobName = azureFileName,
+            byteRange = {
                 startByte: offset,
                 endByte: offset + bytesToRead - 1
             }
             );
-            _ = check io:fileWriteBytes("/tmp/" + azureFileName, chunk, io:APPEND);
+            _ = check io:fileWriteBytes("/tmp/" + azureFileName, chunk.blobContent, io:APPEND);
+            chunkCount += 1;
+            io:println(string `Run ${i + 1}: Chunk ${chunkCount} downloaded, bytes ${offset} to ${offset + bytesToRead - 1}`);
             offset += bytesToRead;
         }
         time:Utc endTime = time:utcNow();
