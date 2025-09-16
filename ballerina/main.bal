@@ -14,9 +14,9 @@ azure_files:ConnectionConfig fileServiceConfig = {
 azure_files:FileClient fileClient = check new (fileServiceConfig);
 
 public function main() returns error? {
-    string localFilePath = "resources/file-1gb.txt";
+    string localFilePath = "resources/file-2gb.txt";
     string fileShareName = "testf1";
-    string azureDirectoryPath = "test-1g";
+    string azureDirectoryPath = "test-2g";
 
 
     // azure_files:FileList file500mb = check fileClient->getFileList(
@@ -47,7 +47,7 @@ public function main() returns error? {
         // check fileClient->createFile(fileShareName = fileShareName, newFileName = azureFileName, fileSizeInByte = fileSize, azureDirectoryPath = azureDirectoryPath);
         // io:println(string `Run ${i + 1}: File created successfully`);
 
-        string azureFileName = string `file-1gb-${i+1}.txt`;
+        string azureFileName = string `file-2gb-${i+1}.txt`;
         int Length = 2139095040;
         io:println(string `File ${azureFileName} of size ${Length}..`);
 
@@ -55,7 +55,7 @@ public function main() returns error? {
 
 
         time:Utc startTime = time:utcNow();
-        int chunkSize = 20 * 1024 * 1024; // 4 MB
+        int chunkSize = 100 * 1024 * 1024; // 4 MB
         int offset = 0;
         int chunkCount = 0;
 
