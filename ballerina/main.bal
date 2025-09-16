@@ -19,27 +19,27 @@ public function main() returns error? {
     string azureDirectoryPath = "test-1g";
 
 
-    azure_files:FileList file500mb = check fileClient->getFileList(
-            fileShareName = fileShareName, 
-            azureDirectoryPath = azureDirectoryPath);
-    azure_files:File|azure_files:File[] files = file500mb.File;
-    map<int> metadata = {};
-    if files is azure_files:File[] {
-        files.forEach(function (azure_files:File file) {
-            azure_files:PropertiesFileItem|"" properties = file.Properties ?: "";
-            int length = 0;
-            do {
-	            length = properties is string ? 0 : properties["Content-Length"] is () ? 0 : check int:fromString(properties["Content-Length"] ?: "0");
-            } on fail {
+    // azure_files:FileList file500mb = check fileClient->getFileList(
+    //         fileShareName = fileShareName, 
+    //         azureDirectoryPath = azureDirectoryPath);
+    // azure_files:File|azure_files:File[] files = file500mb.File;
+    // map<int> metadata = {};
+    // if files is azure_files:File[] {
+    //     files.forEach(function (azure_files:File file) {
+    //         azure_files:PropertiesFileItem|"" properties = file.Properties ?: "";
+    //         int length = 0;
+    //         do {
+	//             length = properties is string ? 0 : properties["Content-Length"] is () ? 0 : check int:fromString(properties["Content-Length"] ?: "0");
+    //         } on fail {
             	
-            }
-            metadata[file.Name] = length;
-        });
-    } else {
-        azure_files:PropertiesFileItem|"" properties = files.Properties ?: "";
-        int length = properties is string ? 0 : properties["Content-Length"] is () ? 0 : check int:fromString(properties["Content-Length"] ?: "0");
-        metadata[files.Name] = length;
-    }
+    //         }
+    //         metadata[file.Name] = length;
+    //     });
+    // } else {
+    //     azure_files:PropertiesFileItem|"" properties = files.Properties ?: "";
+    //     int length = properties is string ? 0 : properties["Content-Length"] is () ? 0 : check int:fromString(properties["Content-Length"] ?: "0");
+    //     metadata[files.Name] = length;
+    // }
 
     // Repeat upload 10 times for accuracy
     foreach int i in 0 ..< 10 {
@@ -48,7 +48,7 @@ public function main() returns error? {
         // io:println(string `Run ${i + 1}: File created successfully`);
 
         string azureFileName = string `file-1gb-${i+1}.txt`;
-        int Length = metadata[azureFileName] ?: 0;
+        int Length = 2139095040;
         io:println(string `File ${azureFileName} of size ${Length}..`);
 
         //Download the file from Azure Files
