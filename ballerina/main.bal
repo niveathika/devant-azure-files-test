@@ -5,7 +5,7 @@ import ballerina/file;
 
 configurable string SAS = ?;
 configurable string accountName = ?;
-configurable string azureDirectoryPath = "test-1g";
+configurable string azureDirectoryPathConfig = "test-1g";
 configurable int chunksize = 100;
 
 azure_files:ConnectionConfig fileServiceConfig = {
@@ -17,7 +17,7 @@ azure_files:BlobClient fileClient = check new (fileServiceConfig);
 public function main() returns error? {
     string localFilePath = "resources/file-1gb.txt";
     string fileShareName = "testf1";
-    string azureDirectoryPath = "test-1g";
+    string azureDirectoryPath = azureDirectoryPathConfig;
 
     // Repeat upload 10 times for accuracy
     foreach int i in 0 ..< 10 {
