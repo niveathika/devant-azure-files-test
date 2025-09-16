@@ -1,6 +1,8 @@
 import ballerina/io;
 import ballerina/time;
 import ballerinax/azure_storage_service.blobs as azure_files;
+import ballerina/file;
+import ballerina/log;
 
 configurable string SAS = ?;
 configurable string accountName = ?;
@@ -26,16 +28,45 @@ public function main() returns error? {
         string azureFileName = string `file-1gb-${i+1}.txt`;
 
         time:Utc startTime = time:utcNow();
-        check fileClient->uploadLargeBlob(
-            containerName = containerName, 
-            filePath = localFilePath, 
-            blobName = azureFileName);
+        check putInLArgeBlob(localFilePath, containerName, azureFileName);
+        // check fileClient->uploadLargeBlob(
+        //     containerName = containerName, 
+        //     filePath = localFilePath, 
+        //     blobName = azureFileName);
         time:Utc endTime = time:utcNow();
 
         time:Seconds seconds = time:utcDiffSeconds(endTime, startTime);
         io:println(string `Run ${i + 1}: Upload duration = ${seconds} seconds`);
     }
     io:println("Completed 10 upload runs.");
+}
+
+function putInLArgeBlob(string localFilePath, string containerName, string blobName) returns error? {
+        
+        int MAX_BLOB_UPLOAD_SIZE = 100 * 1024 * 1024; // 100MB
+
+        file:MetaData fileMetaData = check file:getMetaData(localFilePath);
+        int fileSize = fileMetaData.size;
+        int i = 0; // Index of current block
+        int remainingBytes = fileSize; // Remaining bytes to upload
+        string[] blockIdArray = []; // List of blockIds
+        boolean isOver = false;
+
+        stream<io:Block, io:Error?> fileStream = check io:fileReadBlocksAsStream(localFilePath, MAX_BLOB_UPLOAD_SIZE);
+        while !isOver {
+            record {|byte[] & readonly value;|}? byteBlock = check fileStream.next();
+            if (byteBlock is ()) {
+                isOver = true;
+            } else {
+                string blockId = blobName + ":" + i.toString();
+                blockIdArray[i] = blockId;
+                _ = check fileClient->putBlock(containerName, blobName, blockId, byteBlock.value);
+                log:printInfo("Remaining bytes to upload: " + (remainingBytes - MAX_BLOB_UPLOAD_SIZE).toString() + "Bytes");
+                remainingBytes -= MAX_BLOB_UPLOAD_SIZE;
+                i = i + 1;
+            }
+        }
+        _ = check fileClient->putBlockList(containerName, blobName, blockIdArray, ());
 }
 
 function createUploadFile(int size, string s) returns error? {
