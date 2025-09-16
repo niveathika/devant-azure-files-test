@@ -1,6 +1,6 @@
 import ballerina/io;
 import ballerina/time;
-import ballerinax/azure_storage_service.files as azure_files;
+import ballerinax/azure_storage_service.blobs as azure_files;
 
 configurable string SAS = ?;
 configurable string accountName = ?;
@@ -10,12 +10,11 @@ azure_files:ConnectionConfig fileServiceConfig = {
     accountName: accountName,
     authorizationMethod: azure_files:ACCESS_KEY
 };
-azure_files:FileClient fileClient = check new (fileServiceConfig);
+azure_files:BlobClient fileClient = check new (fileServiceConfig);
 
 public function main() returns error? {
     string localFilePath = "/tmp/file-1gb.txt";
-    string fileShareName = "testf1";
-    string azureDirectoryPath = "test-1g";
+    string containerName = "test-1g";
     check createUploadFile(1024 ,"gb");
 
     // Repeat upload 10 times for accuracy
@@ -27,11 +26,10 @@ public function main() returns error? {
         string azureFileName = string `file-1gb-${i+1}.txt`;
 
         time:Utc startTime = time:utcNow();
-        check fileClient->directUpload(
-            fileShareName = fileShareName, 
-            localFilePath = localFilePath, 
-            azureFileName = azureFileName, 
-            azureDirectoryPath = azureDirectoryPath);
+        check fileClient->uploadLargeBlob(
+            containerName = containerName, 
+            filePath = localFilePath, 
+            blobName = azureFileName);
         time:Utc endTime = time:utcNow();
 
         time:Seconds seconds = time:utcDiffSeconds(endTime, startTime);
