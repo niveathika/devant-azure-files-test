@@ -14,9 +14,9 @@ azure_files:ConnectionConfig fileServiceConfig = {
 azure_files:FileClient fileClient = check new (fileServiceConfig);
 
 public function main() returns error? {
-    string localFilePath = "resources/file-2gb.txt";
+    string localFilePath = "resources/file-1gb.txt";
     string fileShareName = "testf1";
-    string azureDirectoryPath = "test-2g";
+    string azureDirectoryPath = "test-1g";
 
 
     azure_files:FileList file500mb = check fileClient->getFileList(
@@ -47,7 +47,7 @@ public function main() returns error? {
         // check fileClient->createFile(fileShareName = fileShareName, newFileName = azureFileName, fileSizeInByte = fileSize, azureDirectoryPath = azureDirectoryPath);
         // io:println(string `Run ${i + 1}: File created successfully`);
 
-        string azureFileName = string `file-2gb-${i+1}.txt`;
+        string azureFileName = string `file-1gb-${i+1}.txt`;
         int Length = metadata[azureFileName] ?: 0;
         io:println(string `File ${azureFileName} of size ${Length}..`);
 
@@ -55,20 +55,40 @@ public function main() returns error? {
 
 
         time:Utc startTime = time:utcNow();
-        int chunkSize = 4 * 1024 * 1024; // 4 MB
+        int chunkSize = 20 * 1024 * 1024; // 4 MB
         int offset = 0;
-        
+        int chunkCount = 0;
+
         while offset < Length {
+            io:println(string `Downloading chunk ${chunkCount + 1} at offset ${offset}`);
+            chunkCount += 1;
             int bytesToRead = (Length - offset) < chunkSize ? (Length - offset) : chunkSize;
-            byte[] chunk = check fileClient->getFileAsByteArray(
-            fileShareName = fileShareName,
-            azureDirectoryPath = azureDirectoryPath,
-            fileName = azureFileName,
-            range = {
-                startByte: offset,
-                endByte: offset + bytesToRead - 1
+
+            byte[] chunk = [];
+            int retryCount = 0;
+            error? lastErr = ();
+            while retryCount < 3 {
+                var result = fileClient->getFileAsByteArray(
+                    fileShareName = fileShareName,
+                    azureDirectoryPath = azureDirectoryPath,
+                    fileName = azureFileName,
+                    range = {
+                        startByte: offset,
+                        endByte: offset + bytesToRead - 1
+                    }
+                );
+                if result is byte[] {
+                    chunk = result;
+                    break;
+                } else {
+                    lastErr = result;
+                    retryCount += 1;
+                    io:println(string `Retry ${retryCount}: Failed to download chunk at offset ${offset}. Error: ${result.toString()}`);
+                }
             }
-            );
+            if retryCount == 3 {
+                return lastErr;
+            }
             _ = check io:fileWriteBytes("/tmp/" + azureFileName, chunk, io:APPEND);
             offset += bytesToRead;
         }
