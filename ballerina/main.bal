@@ -16,7 +16,7 @@ azure_files:BlobClient fileClient = check new (fileServiceConfig);
 
 public function main() returns error? {
     string localFilePath = "/tmp/file-1gb.txt";
-    string containerName = "test-1g";
+    string containerName = "test-1g-10";
     check createUploadFile(1024 ,"gb");
 
     // Repeat upload 10 times for accuracy
