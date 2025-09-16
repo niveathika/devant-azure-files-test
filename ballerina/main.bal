@@ -31,7 +31,7 @@ public function main() returns error? {
         //Download the file from Azure Files
 
         time:Utc startTime = time:utcNow();
-        int chunkSize = 100 * 1024 * 1024; // 4 MB
+        int chunkSize = 20 * 1024 * 1024; // 4 MB
         int offset = 0;
         int chunkCount = 0;
 
