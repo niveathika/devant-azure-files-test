@@ -16,7 +16,7 @@ azure_files:BlobClient fileClient = check new (fileServiceConfig);
 
 public function main() returns error? {
     string localFilePath = "/tmp/file-1gb.txt";
-    string containerName = "test-1g-10";
+    string containerName = "test-1g";
     check createUploadFile(1024 ,"gb");
 
     // Repeat upload 10 times for accuracy
@@ -43,7 +43,7 @@ public function main() returns error? {
 
 function putInLArgeBlob(string localFilePath, string containerName, string blobName) returns error? {
         
-        int MAX_BLOB_UPLOAD_SIZE = 10 * 1024 * 1024; // 100MB
+        int MAX_BLOB_UPLOAD_SIZE = 100 * 1024 * 1024; // 100MB
 
         file:MetaData fileMetaData = check file:getMetaData(localFilePath);
         int fileSize = fileMetaData.size;
