@@ -58,7 +58,7 @@ function putInLArgeBlob(string localFilePath, string containerName, string blobN
             if (byteBlock is ()) {
                 isOver = true;
             } else {
-                string blockId = blobName + (i+1).toBalString().padStart(3, "0");
+                string blockId = blobName + (i+1).toBalString().padStart(2, "0");
                 blockIdArray[i] = blockId;
                 io:println("Uploading block: " + blockId + " of size: " + byteBlock.value.length().toString() + "Bytes");
                 _ = check fileClient->putBlock(containerName, blobName, blockId, byteBlock.value);
