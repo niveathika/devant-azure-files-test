@@ -55,7 +55,7 @@ public function main() returns error? {
 
 
         time:Utc startTime = time:utcNow();
-        int chunkSize = 4 * 1024 * 1024; // 4 MB
+        int chunkSize = 10 * 1024 * 1024; // 4 MB
         int offset = 0;
         
         while offset < Length {
