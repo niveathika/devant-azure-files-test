@@ -6,7 +6,7 @@ import ballerina/file;
 configurable string SAS = ?;
 configurable string accountName = ?;
 configurable string azureDirectoryPathConfig = "test-1g";
-configurable int chunksize = 100;
+configurable int chunksize = 20;
 
 azure_files:ConnectionConfig fileServiceConfig = {
     accessKeyOrSAS: SAS,
