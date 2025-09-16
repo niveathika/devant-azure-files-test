@@ -43,7 +43,7 @@ public function main() returns error? {
 
 function putInLArgeBlob(string localFilePath, string containerName, string blobName) returns error? {
         
-        int MAX_BLOB_UPLOAD_SIZE = 100 * 1024 * 1024; // 100MB
+        int MAX_BLOB_UPLOAD_SIZE = 4 * 1024 * 1024; // 100MB
 
         file:MetaData fileMetaData = check file:getMetaData(localFilePath);
         int fileSize = fileMetaData.size;
