@@ -1,6 +1,6 @@
 import ballerina/io;
 import ballerina/time;
-import ballerinax/azure_storage_service.blobs as azure_files;
+import ballerinax/azure_storage_service.files as azure_files;
 import ballerina/file;
 
 configurable string SAS = ?;
@@ -11,7 +11,7 @@ azure_files:ConnectionConfig fileServiceConfig = {
     accountName: accountName,
     authorizationMethod: azure_files:ACCESS_KEY
 };
-azure_files:BlobClient fileClient = check new (fileServiceConfig);
+azure_files:FileClient fileClient = check new (fileServiceConfig);
 
 public function main() returns error? {
     string localFilePath = "resources/file-500mb.txt";
@@ -30,17 +30,19 @@ public function main() returns error? {
 
         //Download the file from Azure Files
 
+
         time:Utc startTime = time:utcNow();
-        int chunkSize = 20 * 1024 * 1024; // 4 MB
+        int chunkSize = 25 * 1024 * 1024; // 4 MB
         int offset = 0;
         int chunkCount = 0;
 
         while offset < Length {
             int bytesToRead = (Length - offset) < chunkSize ? (Length - offset) : chunkSize;
-            azure_files:BlobResult chunk = check fileClient->getBlob(
-            containerName = azureDirectoryPath,
-            blobName = azureFileName,
-            byteRange = {
+            byte[] chunk = check fileClient->getFileAsByteArray(
+            fileShareName = fileShareName,
+            azureDirectoryPath = azureDirectoryPath,
+            fileName = azureFileName,
+            range = {
                 startByte: offset,
                 endByte: offset + bytesToRead - 1
             }
