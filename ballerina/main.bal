@@ -56,24 +56,6 @@ public function main() returns error? {
         time:Seconds seconds = time:utcDiffSeconds(endTime, startTime);
         io:println(string `Run ${i + 1}: Download duration = ${seconds} seconds`);
 
-        time:Utc startTimeProcess = time:utcNow();
-        stream<string, io:Error?> fileLines = check io:fileReadLinesAsStream("/tmp/" + azureFileName);
-        int lineCount = 0;
-        check from string line in fileLines 
-        do {
-            if line != "This is a perf test line for Azure Files." && 
-                line != "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" {
-                io:println(string `Diff line: "${line}"`);
-            }
-            lineCount += 1;
-        };
-        io:println(string `Run ${i + 1}: Total lines read = ${lineCount}`);
-        time:Utc endTimeProcess = time:utcNow();
-
-        time:Seconds processSec = time:utcDiffSeconds(endTimeProcess, startTimeProcess);
-        io:println(string `Run ${i + 1}: Process duration = ${processSec} seconds`);
-
-        io:println(string `Total time (download + process) = ${seconds + processSec} seconds`);
         check file:remove("/tmp/" + azureFileName);
     }
 
