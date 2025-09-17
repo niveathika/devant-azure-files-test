@@ -1,23 +1,21 @@
 import ballerina/io;
 import ballerina/time;
-import ballerinax/azure_storage_service.blobs as azure_files;
+import ballerinax/azure_storage_service.files as azure_files;
 import ballerina/file;
 
 configurable string SAS = ?;
 configurable string accountName = ?;
-configurable string azureDirectoryPathConfig = "test-1g";
-configurable int chunksize = 20;
-
 azure_files:ConnectionConfig fileServiceConfig = {
     accessKeyOrSAS: SAS,
     accountName: accountName,
     authorizationMethod: azure_files:ACCESS_KEY
 };
-azure_files:BlobClient fileClient = check new (fileServiceConfig);
+azure_files:FileClient fileClient = check new (fileServiceConfig);
+
 public function main() returns error? {
     string localFilePath = "resources/file-1gb.txt";
     string fileShareName = "testf1";
-    string azureDirectoryPath = azureDirectoryPathConfig;
+    string azureDirectoryPath = "test-1gb";
 
     // Repeat upload 10 times for accuracy
     foreach int i in 0 ..< 10 {
@@ -31,22 +29,24 @@ public function main() returns error? {
 
         //Download the file from Azure Files
 
+
         time:Utc startTime = time:utcNow();
-        int chunkSize = chunksize * 1024 * 1024; // 4 MB
+        int chunkSize = 25 * 1024 * 1024; // 4 MB
         int offset = 0;
         int chunkCount = 0;
 
         while offset < Length {
             int bytesToRead = (Length - offset) < chunkSize ? (Length - offset) : chunkSize;
-            azure_files:BlobResult chunk = check fileClient->getBlob(
-            containerName = azureDirectoryPath,
-            blobName = azureFileName,
-            byteRange = {
+            byte[] chunk = check fileClient->getFileAsByteArray(
+            fileShareName = fileShareName,
+            azureDirectoryPath = azureDirectoryPath,
+            fileName = azureFileName,
+            range = {
                 startByte: offset,
                 endByte: offset + bytesToRead - 1
             }
             );
-            _ = check io:fileWriteBytes("/tmp/" + azureFileName, chunk.blobContent, io:APPEND);
+            _ = check io:fileWriteBytes("/tmp/" + azureFileName, chunk, io:APPEND);
             chunkCount += 1;
             io:println(string `Run ${i + 1}: Chunk ${chunkCount} downloaded, bytes ${offset} to ${offset + bytesToRead - 1}`);
             offset += bytesToRead;
