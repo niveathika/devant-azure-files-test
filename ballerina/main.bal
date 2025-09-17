@@ -1,6 +1,6 @@
 import ballerina/io;
 import ballerina/time;
-import ballerinax/azure_storage_service.blobs as azure_files;
+import ballerinax/azure_storage_service.files as azure_files;
 import ballerina/file;
 
 configurable string SAS = ?;
