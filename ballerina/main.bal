@@ -47,7 +47,7 @@ public function main() returns error? {
                 endByte: offset + bytesToRead - 1
             }
             );
-            _ = check io:fileWriteBytes("/tmp/" + azureFileName, chunk.blobContent, io:APPEND);
+            _ = check io:fileWriteBytes("/tmp/" + azureFileName, chunk, io:APPEND);
             chunkCount += 1;
             io:println(string `Run ${i + 1}: Chunk ${chunkCount} downloaded, bytes ${offset} to ${offset + bytesToRead - 1}`);
             offset += bytesToRead;
