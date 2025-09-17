@@ -15,7 +15,7 @@ azure_files:FileClient fileClient = check new (fileServiceConfig);
 public function main() returns error? {
     string localFilePath = "resources/file-2gb.txt";
     string fileShareName = "testf1";
-    string azureDirectoryPath = "test-2";
+    string azureDirectoryPath = "test-2g";
 
     // Repeat upload 10 times for accuracy
     foreach int i in 0 ..< 10 {
